@@ -29,3 +29,125 @@ class GitHubMCPServer:
         self.name = "github mcp"
         self.github_api = GitHubAPI()
         print("Github MCP Server intilized", file=sys.stderr)
+        
+    def get_tools():
+        '''list all the tools avalaiable for Claude'''  
+        
+        # listing out all the tools, its descp, input params and its defination 
+        return [
+            {
+                "name": "get_users",
+                "description": "Get yout GitHub profile information",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {}
+                }
+
+            },
+            {
+                "name": "get_repos",
+                "description": "Get yout GitHub repositories",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "sort": {
+                            "type": "string",
+                            "description": "Sort by: updated, created, or pushed"
+                        },
+                        "limit": {
+                            "type": "integer",
+                            "description": "Number of repos to return",
+                            "default": 10
+                        }
+                    }
+                }   
+            },
+            {
+                "name": "get_issues",
+                "description": "Search for issues in your repositories",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "query": {
+                            "type": "string",
+                            "description": "Search query (e.g.,'bug', 'feature')"
+                        },
+                        "limit": {
+                            "type": "integer",
+                            "description": "number of issues to return",
+                            "default": 10
+                        }
+                    },
+                    "required": ["query"]
+                }
+            }
+        ]
+        
+    def handle_tool_call(self, tool_name: str, arguments: dict):
+        ''' Execute a tool based on its name'''
+        
+        if tool_name == "get_users":
+            return self.github_api.get_user()
+        
+        elif tool_name == "get_repos":
+            return self.github_api.get_repos(
+                sort= arguments.get("sort", "updated"),
+                limit= arguments.get("limit", 10)
+            )   
+            
+        elif tool_name == "get_issues":
+            return self.github_api.get_repos(
+                query= arguments.get("query"),
+                limit= arguments.get("limit", 10)
+            )   
+        
+        else:
+            return {"error": f"Unknown tool: {tool_name}"}
+        
+    
+    def handle_requests(self, request: dict):
+        ''' Process a JSON-RPC request'''
+    
+        method = request.get("method")
+        request_id = request.get("id")
+        
+        # Request: list all the tools
+        if method == "tools/list":
+            return {
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "result": {
+                    "tools": self.get_tools() # getting the result from get_tool from github api
+                }
+            }
+         
+         # Request: Call a tools
+        elif method == "tools/call":
+            
+            tool_name = request["param"]["name"],
+            arguments = request["param"]["arguments"]
+            
+            result = self.handle_tool_call(tool_name, arguments)
+            
+            return {
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "result": result
+            }   
+
+        #Request: Unknown tool
+        else:
+            return {
+                "jsonrpc": "2.0",
+                "id": request_id,
+                "error": {
+                    "code": 404,
+                    "message": "Method not found!"
+                }
+                
+            }
+        
+    
+    
+        
+            
