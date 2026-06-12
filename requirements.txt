@@ -1,0 +1,4 @@
+#  For making HTTP calls
+requests==2.31.0
+#Official Python library for GitHub API
+PyGithub==2.1.1
