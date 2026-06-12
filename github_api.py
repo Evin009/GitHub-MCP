@@ -28,3 +28,31 @@ class GitHubAPI:
         }
         
         print(f"GitHub Initilized")
+        
+    def get_user(self):
+        ''' retreive github profile info'''
+        
+        try:
+            # make GET request to /user endpoint
+            url = f"{self.base_url}/user"
+            response = requests.get(url, headers=self.headers)
+            
+            # check if request was successful
+            if response.status_code != 200:
+                return {"error" : f"Failed to get user info: {response.status_code}"}
+            
+            # parse the data to json
+            data = response.json()
+            
+            # returning imp info from the json just parsed
+            return {
+                "username": data.get("login"),
+                "name": data.get("name"),
+                "bio": data.get("bio"),
+                "public_repose": data.get("public_repose"),
+                "followers": data.get("followers"),
+                "following": data.get("following")
+            }
+            
+        except Exception as e:
+            return {"error": str(e)}
