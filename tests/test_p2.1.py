@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from github_mcp_server import GitHubMCPServer
 
 print("-- STEP 1: server init --")
@@ -39,6 +42,15 @@ try:
         
         tool_names.append(tool['name'])
         print(f"{tool['name']} has all needed fields")
+        
+    # --------------------------------------------------------------------- #
+    print()
+    # --------------------------------------------------------------------- #
+    
+    #check tool names
+    expected = ["get_users", "get_repos", "get_issues"]
+    assert tool_names == expected, f"Wrong tools: {tool_names}"
+    print(f"All tools present: {tool_names}")
     
     
 except Exception as e:
