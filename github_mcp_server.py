@@ -36,7 +36,7 @@ class GitHubMCPServer:
         # listing out all the tools, its descp, input params and its defination 
         return [
             {
-                "name": "get_users",
+                "name": "get_user",
                 "description": "Get your GitHub profile information",
                 "inputSchema": {
                     "type": "object",
@@ -86,7 +86,7 @@ class GitHubMCPServer:
     def handle_tool_call(self, tool_name: str, arguments: dict):
         ''' Execute a tool based on its name'''
         
-        if tool_name == "get_users":
+        if tool_name == "get_user":
             return self.github_api.get_user()
         
         elif tool_name == "get_repos":
@@ -124,7 +124,7 @@ class GitHubMCPServer:
          # Request: Call a tools
         elif method == "tools/call":
             
-            tool_name = request["params"]["name"],
+            tool_name = request["params"]["name"]
             arguments = request["params"]["arguments"]
             
             result = self.handle_tool_call(tool_name, arguments)
