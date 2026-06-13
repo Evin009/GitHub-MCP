@@ -28,7 +28,7 @@ class GitHubAPI:
                 "Accept": "application/vnd.github.v3+json"
         }
         
-        print(f"GitHub Initilized")
+        # print(f"GitHub Initilized")
         
     def get_user(self):
         ''' retreive github profile info'''
@@ -95,7 +95,7 @@ class GitHubAPI:
             }
         
         except Exception as e:
-            print("Error:", e)
+            return f"Error: {str(e)}"
             
     def get_issues(self, query, limit=10):
         ''' search for issues across all the repos'''
@@ -135,5 +135,5 @@ class GitHubAPI:
             }
         
         except Exception as e:
-            print("Error: ", e)
+            return f"Error: {str(e)}"
         

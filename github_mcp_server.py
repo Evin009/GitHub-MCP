@@ -28,7 +28,7 @@ class GitHubMCPServer:
     def __init__(self):
         self.name = "github mcp"
         self.github_api = GitHubAPI()
-        print("Github MCP Server intilized", file=sys.stderr)
+        # print("Github MCP Server intilized", file=sys.stderr)
         
     def get_tools(self):
         '''list all the tools avalaiable for Claude'''  
