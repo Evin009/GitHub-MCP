@@ -37,7 +37,7 @@ class GitHubMCPServer:
         return [
             {
                 "name": "get_users",
-                "description": "Get yout GitHub profile information",
+                "description": "Get your GitHub profile information",
                 "inputSchema": {
                     "type": "object",
                     "properties": {}
@@ -46,7 +46,7 @@ class GitHubMCPServer:
             },
             {
                 "name": "get_repos",
-                "description": "Get yout GitHub repositories",
+                "description": "Get your GitHub repositories",
                 "inputSchema": {
                     "type": "object",
                     "properties": {
@@ -96,7 +96,7 @@ class GitHubMCPServer:
             )   
             
         elif tool_name == "get_issues":
-            return self.github_api.get_repos(
+            return self.github_api.get_issues(
                 query= arguments.get("query"),
                 limit= arguments.get("limit", 10)
             )   
@@ -124,8 +124,8 @@ class GitHubMCPServer:
          # Request: Call a tools
         elif method == "tools/call":
             
-            tool_name = request["param"]["name"],
-            arguments = request["param"]["arguments"]
+            tool_name = request["params"]["name"],
+            arguments = request["params"]["arguments"]
             
             result = self.handle_tool_call(tool_name, arguments)
             
@@ -141,7 +141,7 @@ class GitHubMCPServer:
                 "jsonrpc": "2.0",
                 "id": request_id,
                 "error": {
-                    "code": 404,
+                    "code": -32601,
                     "message": "Method not found!"
                 }
                 
@@ -162,31 +162,32 @@ def main():
             response = server.handle_requests(request)
             
             # send response to stdout
-            print(json.dump(response))
+            print(json.dumps(response))
             sys.stdout.flush()
         
         
+        # common error handling
         except json.JSONDecodeError as e:
             # Invalid JSON
-            error_resposne = {
+            error_response = {
                 "jsonrpc": "2.0",
                 "error": {
-                    "code": 404,
+                    "code": -32700,
                     "message": "Parse error"
                 }
             }
-            print(json.dump(error_resposne))
+            print(json.dumps(error_response))
             sys.stdout.flush()
             
         except Exception as e:
-            error_resposne = {
+            error_response = {
                 "jsonrpc": "2.0",
                 "error": {
-                    "code": 404,
+                    "code": -32603,
                     "message": f"Internal error: {str(e)}"
                 }
             }
-            print(json.dump(error_resposne))
+            print(json.dumps(error_response))
             sys.stdout.flush()
    
 if __name__ == "__main__":
