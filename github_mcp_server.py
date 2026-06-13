@@ -30,7 +30,7 @@ class GitHubMCPServer:
         self.github_api = GitHubAPI()
         print("Github MCP Server intilized", file=sys.stderr)
         
-    def get_tools():
+    def get_tools(self):
         '''list all the tools avalaiable for Claude'''  
         
         # listing out all the tools, its descp, input params and its defination 
@@ -106,7 +106,7 @@ class GitHubMCPServer:
         
     
     def handle_requests(self, request: dict):
-        ''' Process a JSON-RPC request'''
+        ''' Process a JSON-RPC request coming from Claude'''
     
         method = request.get("method")
         request_id = request.get("id")
@@ -147,7 +147,50 @@ class GitHubMCPServer:
                 
             }
         
+def main():
+    ''' Main loop - read from stdin, write to stdout'''
     
+    server = GitHubMCPServer()
+    
+    # read JSON-RPC request from stdin
+    for line in sys.stdin:
+        try:  
+            # parse incoming data into json
+            request = json.loads(line)
+            
+            # handle the request
+            response = server.handle_requests(request)
+            
+            # send response to stdout
+            print(json.dump(response))
+            sys.stdout.flush()
+        
+        
+        except json.JSONDecodeError as e:
+            # Invalid JSON
+            error_resposne = {
+                "jsonrpc": "2.0",
+                "error": {
+                    "code": 404,
+                    "message": "Parse error"
+                }
+            }
+            print(json.dump(error_resposne))
+            sys.stdout.flush()
+            
+        except Exception as e:
+            error_resposne = {
+                "jsonrpc": "2.0",
+                "error": {
+                    "code": 404,
+                    "message": f"Internal error: {str(e)}"
+                }
+            }
+            print(json.dump(error_resposne))
+            sys.stdout.flush()
+   
+if __name__ == "__main__":
+    main()
     
         
             
